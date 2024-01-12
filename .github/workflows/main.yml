@@ -40,7 +40,7 @@ jobs:
       run: |
         git config pull.rebase true
         git config merge.ours.driver true
-        git rebase --abort
+        git rebase --abort >>/dev/null
         git merge -X ours origin/main
         
         
