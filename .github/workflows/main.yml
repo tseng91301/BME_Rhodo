@@ -40,8 +40,9 @@ jobs:
       run: |
         git config pull.rebase true
         git config merge.ours.driver true
-        git merge -X ours origin/main
+        
         git pull origin main
+        git merge -X ours origin/main
     
     - name: Push new data to main
       run: |
