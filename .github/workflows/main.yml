@@ -50,6 +50,14 @@ jobs:
           echo "Rebase completed"
           git merge -X ours --no-edit --allow-unrelated-histories origin/main
         fi
+
+        # 找出本地刪除的檔案
+        deleted_files=$(git ls-files --deleted)
+        for file in $deleted_files; do
+          git rm --cached "$file"  # 從暫存區移除刪除的檔案
+        done
+
+        git commit -m "Remove deleted files"
       
         set -e  # 启用错误退出码
         
