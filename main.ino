@@ -13,17 +13,4 @@ void loop(){
 
 }
 
-
-/*Second Commit*/
-/*Third Commit*/
-/*Forth commit*/
-/*Fifth comm*/
-/*Sixth commit*/
-/*Seventh commit*/
-/*Eighth commit*/
-/*Nine commit*/
-//fdjfs
-/*11st commit*/
-/*12nd commit*/
-
-//Crazy
+/*13th commit*/
