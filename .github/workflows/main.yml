@@ -38,6 +38,7 @@ jobs:
     
     - name: Fetch previous data
       run: |
+        git config pull.rebase true
         git pull origin main
     
     - name: Push new data to main
