@@ -41,7 +41,12 @@ jobs:
         git config pull.rebase true
         git config merge.ours.driver true
         git pull origin main
-        git merge -X ours origin/main
+        if [ $? -ne 0 ]; then
+          echo "Failed to pull, switch to other method"
+          git rebase --abort
+          git merge -X ours origin/main
+        fi
+        
         
     
     - name: Push new data to main
