@@ -7,4 +7,4 @@ if [ $EXIT_CODE -ne 0 ]; then
     git rebase --abort
     git merge -X ours origin/main
     exit 0
-fi ||true
+fi

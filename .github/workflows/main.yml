@@ -37,7 +37,7 @@ jobs:
         git commit -m "Push arduino code"
     
     - name: Fetch previous data
-      run: ./fetch.sh || true
+      run: .github/workflows/fetch.sh || true
         
         
     
