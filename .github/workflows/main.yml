@@ -41,9 +41,6 @@ jobs:
         set +e  # 禁用錯誤退出碼
         git config pull.rebase true
         git config merge.ours.driver true
-        git fetch origin main
-        git reset --hard origin/main
-        git clean -df
         git pull origin main
         EXIT_CODE=$?
         echo $EXIT_CODE
