@@ -20,29 +20,28 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
 
-    - name: Copy File to main Branch(All files)
+    - name: Switch to main branch(Modify)
       run: |
         git branch -M main
-        git pull origin/main
+    
+    - name: Modifying file to the desired form
+      run: |
+        mkdir arduino_code
+        find . -maxdepth 1 -type f ! -name 'arduino_code' -exec mv {} arduino_code/ \;
+        rm -rf .github
+        rm -rf .vscode
+    
+    - name: Commit to new Arduino code commit
+      run: |
         git add .
-        git commit -m "commit arduino code"
+        git commit -m "Push arduino code"
+    
+    - name: Fetch previous data
+      run: |
+        git pull origin main
+    
+    - name: Push new data to main
+      run: |
         git push -u origin main
 
     
-
-    - name: Checkout branch arduino again
-      uses: actions/checkout@v2
-      with:
-        ref: arduino
-
-    - name: Copy File to Release Branch
-      run: |
-        git branch -M release
-        shopt -s extglob
-        rm -rf !(*.h|*.ino|README.md)
-
-    - name: Commit and Push Changes
-      run: |
-        git pull origin/release
-        git add .
-        git commit -m "commit arduino code"
