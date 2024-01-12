@@ -50,6 +50,7 @@ jobs:
               exit 0
           fi
         ' >> ./fetch.sh
+        chmod 755 ./fetch.sh
       
     - name: Fetch previous data
       run: ./fetch.sh || true
