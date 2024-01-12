@@ -1,0 +1,33 @@
+name: Copy File to Release Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  copy-to-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        ref: main  # 指定要检出的分支为 main
+
+    - name: Git initialize work
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Copy File to Release Branch
+      run: |
+        shopt -s extglob
+        rm -rf !(*.h|*.ino|README.md)
+
+    - name: Commit and Push Changes
+      run: |
+        git add .
+        git commit -m "commit2"
+        git branch -M release
+        git push -u origin release --force
