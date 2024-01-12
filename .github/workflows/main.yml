@@ -47,6 +47,7 @@ jobs:
         if [ $EXIT_CODE -ne 0 ]; then
           echo "Failed to pull, switch to other method"
           git rebase --abort
+          echo "Rebase completed"
           git merge -X ours origin/main
         fi
       
