@@ -48,7 +48,7 @@ jobs:
           echo "Failed to pull, switch to other method"
           git rebase --abort
           echo "Rebase completed"
-          git merge -X ours --no-edit origin/main
+          git merge -X ours --no-edit --allow-unrelated-histories origin/main
         fi
       
         set -e  # 启用错误退出码
