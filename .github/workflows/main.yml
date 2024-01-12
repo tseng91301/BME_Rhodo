@@ -36,8 +36,23 @@ jobs:
         git add .
         git commit -m "Push arduino code"
     
+    - name: Copy the try_function script into directory
+      run: |
+        echo '
+          git config pull.rebase true
+          git config merge.ours.driver true
+          git pull origin main
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+              echo "Failed to pull, switch to other method"
+              git rebase --abort
+              git merge -X ours origin/main
+              exit 0
+          fi
+        ' >> ./fetch.sh
+      
     - name: Fetch previous data
-      run: .github/workflows/fetch.sh || true
+      run: ./fetch.sh || true
         
         
     
