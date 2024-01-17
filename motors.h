@@ -74,9 +74,9 @@ class DualMotor{
         void turn_deg(double deg_in){//0 is forward, clockwise
             if(deg_in<=180&&deg_in>=0){ //right
                 leftspeed = 1;
-                rightspeed = sin(deg_in);
+                rightspeed = sin(deg_in+90);
             }else if(deg_in<=0&&deg_in>=-180){ //left
-                leftspeed = sin(deg_in);
+                leftspeed = sin(deg_in+90);
                 rightspeed = 1;
             }
             return;
@@ -114,6 +114,12 @@ class DualMotor{
             }
             speed = 0;
             return;
+        }
+        void back(){
+            speed = -1*abs(speed);
+        }
+        void forward(){
+            speed = abs(speed);
         }
 };
 #endif
