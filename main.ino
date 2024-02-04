@@ -4,29 +4,29 @@
 #include "timer.h"
 #include "uarttransfer.h"
 #include "bt_contorl.h"
+#include "supply.h"
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 DualMotor engine(41,43,45,47);
 TdsSensor tds1(A0);
-Timer generate_detector_data;
+Timer timer;
 BTcontorl contorl1(/*TX = */16, /*RX = */17);
 HRmod waterTemp(A1);
-Motor feed_machine;
-Motor chemical_machine;
+Supply feed_machine(28, 30);
+Supply chemical_machine(32, 34);
 void setup(){
     Serial.begin(9600);
     engine.enable_EN(39, 49);
-    feed_machine.init(28, 30);
     feed_machine.enable_EN(26);
-    chemical_machine.init(32, 34);
+    feed_machine.set_supply_interval(2*60*60*1000);
     chemical_machine.enable_EN(36);
-    generate_detector_data.add(transfer_data,/*delayTime = */ 200);
+    timer.add(transfer_data,/*delayTime = */ 200);
 }
 void loop(){
-    generate_detector_data.execute();
+    feed_machine.start_service();
+    chemical_machine.start_service();
+    timer.execute();
     engine.move();
-    feed_machine.motor_turn();
-    chemical_machine.motor_turn();
     if(contorl1.receive()){
         Serial.println(contorl1.getstr());
     }
