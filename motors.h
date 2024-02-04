@@ -118,6 +118,12 @@ class DualMotor{
         void set_speed(double inp){
             speed = inp;
         }
+        void set_left_speed(double inp){
+            leftspeed = inp;
+        }
+        void set_right_speed(double inp){
+            rightspeed = inp;
+        }
         void set_pid(double inp){
             if(abs(inp-1.0)<=0.0001){
                 mL.set_pid(1);
