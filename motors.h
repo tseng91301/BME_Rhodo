@@ -2,124 +2,158 @@
 #define MOTORS_GH2842 1
 #include<math.h>
 
-class DualMotor{
+class Motor{
     protected:
-        int left1pin;
-        int left2pin;
-        int leftENpin;
-        int right1pin;
-        int right2pin;
-        int rightENpin;
+        int pin1;
+        int pin2;
+        int ENpin;
         bool haveEN = false;
 
-        double leftpid = 1;
-        double rightpid = 1;
-
-        double speed = 0.5;
-        double leftspeed = 0;
-        double rightspeed = 0;
+        double pid = 1;
+        double speed = 0;
         int analog_max = 1023;
     public:
-        DualMotor(const int l1,const int l2,const int r1,const int r2){
-            pinMode(l1,OUTPUT);
-            pinMode(l2,OUTPUT);
-            pinMode(r1,OUTPUT);
-            pinMode(r2,OUTPUT);
-            left1pin = l1;
-            left2pin = l2;
-            right1pin = r1;
-            right2pin = r2;
-        }
-        void enable_EN(const int enl,const int enr){
-            pinMode(enl,OUTPUT);
-            pinMode(enr,OUTPUT);
-            leftENpin = enl;
-            rightENpin = enr;
-            haveEN = true;
-        }
-        void motor_turn(int p1,int p2,int s_in){
-            if(s_in>=0){
-                analogWrite(p1,s_in);
-                analogWrite(p2,0);
-            }else{
-                analogWrite(p1,0);
-                analogWrite(p2,-s_in);
-            }
-        }
-        void move(){
-            static int lspd = -1;
-            static int rspd = -1;
-            int leftspd_after = analog_max*leftpid*leftspeed*speed;
-            int rightspd_after = analog_max*rightpid*rightspeed*speed;
-
-            if(leftspd_after == lspd && rightspd_after == rspd){
-                return;
-            }
-            lspd = leftspd_after;
-            rspd = rightspd_after;
-
-            if(haveEN){
-                int la2 = abs(leftspd_after);
-                int ra2 = abs(rightspd_after);
-                analogWrite(leftENpin,la2);
-                analogWrite(rightENpin,ra2);
-                motor_turn(left1pin,left2pin,(leftspd_after/la2)*analog_max);
-                motor_turn(right1pin,right2pin,(rightspd_after/ra2)*analog_max);
-            }else{
-                motor_turn(left1pin,left2pin,leftspd_after);
-                motor_turn(right1pin,right2pin,rightspd_after);
-            }
-
-        }
-        void turn_deg(double deg_in){//0 is forward, clockwise
-            if(deg_in<=180&&deg_in>=0){ //right
-                leftspeed = 1;
-                rightspeed = sin(deg_in+90);
-            }else if(deg_in<=0&&deg_in>=-180){ //left
-                leftspeed = sin(deg_in+90);
-                rightspeed = 1;
-            }
+        void init(const int p1, const int p2){
+            pin1 = p1;
+            pin2 = p2;
+            pinMode(p1, OUTPUT);
+            pinMode(p2, OUTPUT);
             return;
         }
-        void set_analog_max(int inp){
-            analog_max = inp;
+        void enable_EN(const int enp){
+            ENpin = enp;
+            pinMode(enp, OUTPUT);
+            haveEN = true;
+            return;
+        }
+        void motor_turn(){
+            static int s_before = -1;
+            int s_in = analog_max*speed*pid;
+            if(s_in == s_before){
+                return;
+            }else{
+                s_before = s_in;
+            }
+            int s2;
+            if(haveEN){
+                analogWrite(ENpin, abs(s_in));
+                s2 = analog_max;
+            }else{
+                s2 = abs(s_in);
+            }
+            if(s_in > 0){
+                analogWrite(pin1, s2);
+                analogWrite(pin2, 0);
+            }else{
+                analogWrite(pin1, 0);
+                analogWrite(pin2, s2);
+            }
+        }
+        void set_analog_max(int in){
+            analog_max = in;
             return;
         }
         void set_speed(double inp){
             speed = inp;
             return;
         }
+        void set_pid(double in){
+            pid = in;
+            return;
+        }
+        void stop(){
+            speed = 0;
+            analogWrite(pin1, 0);
+            analogWrite(pin2, 0);
+            if(haveEN){
+                analogWrite(ENpin, 0);
+            }
+            return;
+        }
+};
+class DualMotor{
+    protected:
+        double speed = 0.5;
+        double leftspeed = 0;
+        double rightspeed = 0;
+
+        Motor mL;
+        Motor mR;
+
+        int fb = 1;
+    public:
+        DualMotor(const int l1,const int l2,const int r1,const int r2){
+            mL.init(l1, l2);
+            mR.init(r1, r2);
+        }
+        void enable_EN(const int enl,const int enr){
+            mL.enable_EN(enl);
+            mR.enable_EN(enr);
+        }
+        void move(){
+            mL.set_speed(leftspeed*speed);
+            mR.set_speed(rightspeed*speed);
+            mL.motor_turn();
+            mR.motor_turn();
+        }
+        void turn_deg(double deg_in){//0 is forward, clockwise
+            int fb2 = fb;
+            if(fb2 == 0){
+                fb2 = 1;
+            }
+            if(deg_in<=180&&deg_in>=0){ //right
+                leftspeed = fb2*1;
+                rightspeed = fb2*sin(deg_in+90);
+            }else if(deg_in<=0&&deg_in>=-180){ //left
+                leftspeed = fb2*sin(deg_in+90);
+                rightspeed = fb2*1;
+            }
+            return;
+        }
+        void set_analog_max(int inp){
+            mL.set_analog_max(inp);
+            mR.set_analog_max(inp);
+            return;
+        }
+        void set_speed(double inp){
+            speed = inp;
+        }
         void set_pid(double inp){
             if(abs(inp-1.0)<=0.0001){
-                leftpid = 1;
-                rightpid = 1;
+                mL.set_pid(1);
+                mR.set_pid(1);
             }else if(inp>1.0){
                 double pid_after = double(1.0/inp);
-                leftpid = pid_after;
-                rightpid = 1;
+                mL.set_pid(pid_after);
+                mR.set_pid(1);
             }else{
-                rightpid = inp;
-                leftpid = 1;
+                mL.set_pid(1);
+                mR.set_pid(inp);
             }
             return;
         }
         void stop(){
-            analogWrite(left1pin,0);
-            analogWrite(left2pin,0);
-            analogWrite(right1pin,0);
-            analogWrite(right2pin,0);
-            if(haveEN){
-                analogWrite(leftENpin,0);
-                analogWrite(rightENpin,0);
-            }
-            speed = 0;
+            mL.stop();
+            mR.stop();
+            leftspeed = 0;
+            rightspeed= 0;
+            fb = 0;
             return;
         }
         void back(){
-            speed = -1*abs(speed);
+            leftspeed = -1;
+            rightspeed = -1;
+            fb = -1;
+            return;
         }
         void forward(){
-            speed = abs(speed);
+            leftspeed = 1;
+            rightspeed = 1;
+            fb = 1;
+            return;
+        }
+        int get_FB_state(){
+            return fb;
         }
 };
 #endif
