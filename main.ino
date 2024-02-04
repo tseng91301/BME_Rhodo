@@ -54,38 +54,21 @@ void handle_command(String inp){
     if(doc.containsKey("spd")){
         engine.set_speed(doc["spd"]);
     }
-    if(doc.containsKey("turn")){
-        String dur = doc["turn"];
-        int state = engine.get_FB_state();
-        if(dur == "L"){
-            if(state == 0){
-                engine.turn_deg(-180);
-            }else{
-                engine.turn_deg(-90);
-            }
-        }else if(dur == "R"){
-            if(state == 0){
-                engine.turn_deg(180);
-            }else{
-                engine.turn_deg(90);
-            }
-        }else if(dur == "LS" || dur == "RS"){
-            if(state == 0){
-                engine.stop();
-            }else{
-                engine.turn_deg(0);
-            }
-        }
+    if(doc.containsKey("fbl")){
+        int fbl = doc["fbl"];
+        engine.set_left_speed(fbl);
     }
-    if(doc.containsKey("fb")){
-        String fb = doc["fb"];
-        if(fb == "F"){
-            engine.forward();
-        }else if(fb == "B"){
-            engine.back();
-        }else{
-            engine.stop();
-        }
+    if(doc.containsKey("fbr")){
+        int fbr = doc["fbr"];
+        engine.set_right_speed(fbr);
+    }
+    if(doc.containsKey("feed")){
+        int feed = doc["feed"];
+        feed_machine.set_speed(feed);
+    }
+    if(doc.containsKey("chem")){
+        int chem = doc["chem"];
+        chemical_machine.set_speed(chem);
     }
 }
 
