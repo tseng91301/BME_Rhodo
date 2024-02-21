@@ -5,6 +5,7 @@
 #include "uarttransfer.h"
 #include "bt_contorl.h"
 #include "supply.h"
+#include "phMeter.h"
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 DualMotor engine(41,43,45,47);
@@ -14,8 +15,9 @@ BTcontorl contorl1(/*TX = */16, /*RX = */17);
 HRmod waterTemp(A1);
 Supply feed_machine(28, 30);
 Supply chemical_machine(32, 34);
+PhMeter phmeter(A2);
 void setup(){
-    Serial.begin(9600);
+    Serial.begin(115200);
     engine.enable_EN(39, 49);
     feed_machine.enable_EN(26);
     feed_machine.set_supply_interval(2*60*60*1000);
@@ -23,6 +25,7 @@ void setup(){
     timer.add(transfer_data,/*delayTime = */ 200);
 }
 void loop(){
+    phmeter.start_service();
     feed_machine.start_service();
     chemical_machine.start_service();
     timer.execute();
@@ -35,7 +38,7 @@ void transfer_data(){
     DynamicJsonDocument values(200);
     values["tds"] = tds1.value();
     values["temp"] = waterTemp.value();
-    values["ph"] = 7.0;
+    values["ph"] = phmeter.val();
 
     String values_o;
     serializeJson(values, values_o);

@@ -1,36 +1,45 @@
 #ifndef PH_METER_DS3245
 #define PH_METER_DS3245 1
 class PhMeter{
-    private:    
+    private:
         int sensorPin;
         double offset = 0.00;
         int sample_num = 40;
+        int now_sample_num = 0;
+        double pHvalue = 7.0;
+        int *val_arr = nullptr;
+
+        int get_val_delay = 20;
+        int get_val_nowtime = millis();
     public:
         PhMeter(const int pin){
             // pinMode(pin, INPUT);
+            val_arr = new int[sample_num];
             sensorPin = pin;
             return;
         }
-        double get_vol(){
-            int *read_arr = new int[sample_num];
-            for(int a=0; a<sample_num;a++){
-                read_arr[a] = analogRead(sensorPin);
-                // Serial.print("Tmp value: ");
-                // Serial.println(read_arr[a]);
-                delay(20);
-            }
-            double vol = avergearray(read_arr, sample_num) * 5.0 / 1024.0;
-            Serial.print("Voltage: ");
-            Serial.println(vol);
-            delete[] read_arr;
-            return vol;
+        ~PhMeter(){
+            delete[] val_arr;
         }
+        void start_service();
         double val(){
-            double pHValue = 3.5 * get_vol() + offset;
-            return pHValue;
+            return pHvalue;
         }
         double avergearray(int*, int);
 };
+
+void PhMeter::start_service(){
+    if(millis()-get_val_nowtime >= get_val_delay){
+        // Record value
+        val_arr[now_sample_num++] = analogRead(sensorPin);
+        if(now_sample_num==sample_num){
+            double vol = avergearray(val_arr, sample_num) * 5.0 / 1024.0;
+            pHvalue =  3.5 * vol + offset;
+            now_sample_num = 0;
+        }
+        get_val_nowtime = millis();
+    }
+}
 
 double PhMeter::avergearray(int* arr, int number){
     /*Need reference of this section of code (function)*/
