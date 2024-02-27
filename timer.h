@@ -27,7 +27,7 @@ class Timer{
         void execute(){
             for(int a=0;a<storeFunc_num;a++){
                 int nowtime = millis();
-                if(nowtime - storeFunc[a].TmpTime >= storeFunc[a].offset && !storeFunc[a].execute_num){
+                if(nowtime - storeFunc[a].TmpTime >= storeFunc[a].offset && storeFunc[a].execute_num==0){
                     storeFunc[a].TmpTime = nowtime;
                     storeFunc[a].func();
                     storeFunc[a].execute_num++;

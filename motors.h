@@ -29,11 +29,6 @@ class Motor{
         void motor_turn(){
             static int s_before = -1;
             int s_in = analog_max*speed*pid;
-            if(s_in == s_before){
-                return;
-            }else{
-                s_before = s_in;
-            }
             int s2;
             if(haveEN){
                 analogWrite(ENpin, abs(s_in));
@@ -65,6 +60,7 @@ class Motor{
             speed = 0;
             analogWrite(pin1, 0);
             analogWrite(pin2, 0);
+
             if(haveEN){
                 analogWrite(ENpin, 0);
             }
@@ -93,7 +89,9 @@ class DualMotor{
         void move(){
             mL.set_speed(leftspeed*speed);
             mR.set_speed(rightspeed*speed);
+            // Serial.print("L");
             mL.motor_turn();
+            // Serial.print("R");
             mR.motor_turn();
         }
         void turn_deg(double deg_in){//0 is forward, clockwise
