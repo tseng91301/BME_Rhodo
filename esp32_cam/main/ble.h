@@ -1,0 +1,1 @@
+const char* BLUETOOTH_NAME="Sashimi Auto Cook Ship";
