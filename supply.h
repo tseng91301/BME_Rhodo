@@ -102,6 +102,7 @@ class supply2: public Servo360{
         void stop_supply(){
             toggle = false;
             supplying = false;
+            write(90);
         }
 };
 #endif
