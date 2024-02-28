@@ -1,0 +1,1 @@
+find . -maxdepth 1 -type f ! -name 'hardware_information' -exec mv {} hardware_information/ \;
